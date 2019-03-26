@@ -45,6 +45,11 @@ router.post("/", async (req, res) => {
     // Json data zit in req.body object
     const data = req.body;
 
+    const { error } = Boek.joiValidate(data);
+    if (error) {
+        return res.status(400).send(error);        
+    }
+
     try {
         const nieuwBoek = new Boek(data);
         const toegevoegdBoek = await Boek.create(nieuwBoek);
@@ -102,7 +107,7 @@ router.delete("/:id", async (req, res) => {
 //             runValidators: true // Voer ook sommige schema validators uit
 //         });
 
-//         // Zijn er gewijzigde records?
+//         // Zijn er gewijzigde documenten?
 //         if (!n) {
 //             return res.status(404).send(`Boek met id ${req.params.id} werd niet gevonden.`);
 //         }
@@ -124,7 +129,7 @@ router.put("/:id", async (req, res) => {
             new: true   // Geef geupdate object terug 
         });
 
-        // Zijn er gewijzigde records?
+        // Zijn er gewijzigde docuementen?
         if (!boek) {
             return res.status(404).send(`Boek met id ${req.params.id} werd niet gevonden.`);
         }

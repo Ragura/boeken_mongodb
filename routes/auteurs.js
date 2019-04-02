@@ -17,6 +17,13 @@ router.get("/", async (req, res) => {
 // Nieuwe auteur
 router.post("/", async (req, res) => {
     const data = req.body;
+
+    const { error } = Auteur.joiValidate(data);
+
+    if (error) {
+        return res.status(400).send(error);        
+    }
+   
     const nieuweAuteur = new Auteur(data);
     const toegevoegdeAuteur = await Auteur.create(nieuweAuteur);
 

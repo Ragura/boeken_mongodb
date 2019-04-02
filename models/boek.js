@@ -7,12 +7,9 @@ const Auteur = require("./auteur");
 const boekSchema = new Schema({
     titel: {
         type: String,
-        required: true
+        required: true,
+        maxlength: 100
     },
-    // auteur: {
-    //     type: String,
-    //     required: true
-    // },
     auteur: {
         type: Schema.Types.ObjectId,
         ref: Auteur
@@ -23,9 +20,11 @@ const boekSchema = new Schema({
         min: 1
     },
     genres: {
-        type: [String],
-        lowercase: true,
-        enum: ["romantisch", "horror", "fantasy"]
+        type: [{
+            type: String,
+            lowercase: true,
+            enum: ["romantisch", "horror", "fantasy"]
+        }]
     },
     publicatieDatum: {
         type: Date
@@ -33,6 +32,7 @@ const boekSchema = new Schema({
     isbn: {
         type: String,
         unique: true,
+        trim: true,
         // match: /(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)/,
         validate: {
             validator: function(value) {
@@ -46,6 +46,9 @@ const boekSchema = new Schema({
                 }
             },
             message: "Ongeldig ISBN formaat"
+        },
+        set: function(val) {
+            return val.replace(/-/g, "").trim();
         }
     },
     vertaling: {
@@ -65,13 +68,16 @@ const boekSchema = new Schema({
 boekSchema.statics.joiValidate = function(boek) {
     const joiSchema = Joi.object().keys({
         titel: Joi.string().required(),
-        auteur: Joi.string().alphanum().length(12),
+        auteur: Joi.string().alphanum().length(24),
         aantalPaginas: Joi.number().min(1),
         genres: Joi.array().items(Joi.string().valid(["romantisch", "horror", "fantasy"])),
         publicatieDatum: Joi.date(),
         isbn: Joi.string().regex(/(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)/),
         vertaling: Joi.boolean(),
-        taalOrigineel: Joi.string()
+        taalOrigineel: Joi.string().when('vertaling', {
+            is: true,
+            then: Joi.string().required()
+        })
     });
 
     return Joi.validate(boek, joiSchema);

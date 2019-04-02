@@ -46,6 +46,7 @@ router.post("/", async (req, res) => {
     const data = req.body;
 
     const { error } = Boek.joiValidate(data);
+
     if (error) {
         return res.status(400).send(error);        
     }
@@ -121,7 +122,7 @@ router.delete("/:id", async (req, res) => {
 // Optie 3: findOneAndUpdate()
 router.put("/:id", async (req, res) => {
     const data = req.body;
-    
+       
     try {
         // updateOne() slaagt validation over tenzij de optie runValidators aanstaat
         const boek = await Boek.findByIdAndUpdate(req.params.id, data, {

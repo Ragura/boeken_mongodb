@@ -3,13 +3,13 @@ const logger = require("./logger");
 
 module.exports = (err, req, res, next) => {
     if (err.name === "ValidationError") {        
-        res.status(400).send(err._message);
+        return res.status(400).send(err._message);
     }
 
     // Ongeldige JSON notatie (fout in body-parser)
     if (err.type === "entity.parse.failed") {
-        res.status(400).send("Ongeldig JSON formaat");
+        return res.status(400).send("Ongeldig JSON formaat");
     }
     
-    res.status(500).send(err);
+    return res.status(500).send(err);
 };

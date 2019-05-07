@@ -1,30 +1,31 @@
-const logger = require('./logger');
-const express = require('express');
+const logger = require("./logger");
+const express = require("express");
 require("express-async-errors");
-const cors = require('cors');
-const boeken = require('./routes/boeken');
-const auteurs = require('./routes/auteurs');
-const errorHandler = require('./errorhandler')
+const cors = require("cors");
+const boeken = require("./routes/boeken");
+const auteurs = require("./routes/auteurs");
+const errorHandler = require("./errorhandler");
 
 // Mongoose
 const mongoose = require("mongoose");
 
 // Maak verbinding met de MongoDB database
 // Het tweede argument bevat opties voor de connectie
-mongoose.connect("mongodb://127.0.0.1:27017/cvo_boeken", {
-        useNewUrlParser: true,
-        useFindAndModify: false,
-        useCreateIndex: true
-    })
-    // de connect() methode geeft een promise terug
-    .then(() => {
-        logger.info("Verbonden met Mongodb");
-        // console.log("Verbonden met Mongodb");        
-    })
-    .catch((err) => {
-        console.log(err);
-        process.exit(1);        
-    });
+mongoose
+  .connect("mongodb://127.0.0.1:27017/cvo_boeken", {
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useCreateIndex: true
+  })
+  // de connect() methode geeft een promise terug
+  .then(() => {
+    logger.info("Verbonden met Mongodb");
+    // console.log("Verbonden met Mongodb");
+  })
+  .catch(err => {
+    console.log(err);
+    process.exit(1);
+  });
 
 const app = express();
 
@@ -40,8 +41,12 @@ app.use(express.json());
 app.use("/boeken", boeken);
 app.use("/auteurs", auteurs);
 
+app.use("*", (req, res) => {
+  res.status(404).send("Ongeldig API pad.");
+});
+
 app.use(errorHandler);
 
 app.listen(port, () => {
-    console.log(`Server luistert op poort ${port}`);    
+  console.log(`Server luistert op poort ${port}`);
 });
